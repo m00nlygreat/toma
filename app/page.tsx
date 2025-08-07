@@ -2,7 +2,9 @@ import { Button } from "@/components/ui/button";
 import { ContributionHeatmap } from "@/components/ui/contribution-heatmap";
 import { FeedItem } from "@/components/ui/feed-item";
 import { PomodoroTimer } from "@/components/ui/pomodoro-timer";
-import { Switch } from "@/components/ui/toggle-switch";
+import dynamic from "next/dynamic";
+
+import { ClientToggleSwitch } from "@/components/client-toggle-switch";
 import { TaskCard } from "@/components/ui/task-card";
 
 export default function Home() {
@@ -45,10 +47,7 @@ export default function Home() {
 
           <div>
             <h2 className="text-subheadline font-semibold mb-4">Toggle Switch</h2>
-            <div className="flex items-center space-x-2">
-              <Switch id="long-break" />
-              <label htmlFor="long-break">Long Break</label>
-            </div>
+            <ClientToggleSwitch />
           </div>
 
           <div>
