@@ -1,16 +1,63 @@
+
+'use client';
+
 import { Button } from "@/components/ui/button";
 import { ContributionHeatmap } from "@/components/ui/contribution-heatmap";
 import { FeedItem } from "@/components/ui/feed-item";
 import { PomodoroTimer } from "@/components/ui/pomodoro-timer";
-import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
 
 import { ClientToggleSwitch } from "@/components/client-toggle-switch";
 import { TaskCard } from "@/components/ui/task-card";
 
 export default function Home() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+      setLoading(false);
+    };
+
+    getSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
     <main className="container mx-auto p-4">
-      <h1 className="text-headline font-bold mb-8">Toma</h1>
+      <header className="flex justify-between items-center mb-8">
+        <h1 className="text-headline font-bold">Toma</h1>
+        <div>
+          {loading ? (
+            <p>Loading...</p>
+          ) : user ? (
+            <div className="flex items-center space-x-4">
+              <p>{user.email}</p>
+              <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
+            </div>
+          ) : (
+            <Link href="/auth">
+              <Button variant="outline">Sign In</Button>
+            </Link>
+          )}
+        </div>
+      </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2">
