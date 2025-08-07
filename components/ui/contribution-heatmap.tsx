@@ -6,12 +6,20 @@ const ContributionHeatmap = () => {
     count: Math.floor(Math.random() * 5),
   }))
 
+  const levelClasses = [
+    "bg-cream-white-surface",
+    "bg-basil-green/20",
+    "bg-basil-green/40",
+    "bg-basil-green/60",
+    "bg-basil-green",
+  ]
+
   return (
     <div className="flex flex-wrap gap-1">
       {data.map((day, i) => (
         <div
           key={i}
-          className={`h-4 w-4 rounded-sm ${day.count > 0 ? `bg-basil-green/${day.count * 20}` : "bg-gray-200"}`}
+          className={`h-4 w-4 rounded-sm ${levelClasses[day.count]}`}
           title={`${day.date.toDateString()} - ${day.count} harvested`}
         ></div>
       ))}
