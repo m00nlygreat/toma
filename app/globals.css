@@ -1,6 +1,20 @@
 @import "tailwindcss";
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
+@theme {
+  --color-tomato-red: #EF5842;
+  --color-basil-green: #69983F;
+  --color-cream-white: #FFF7E9;
+  --color-cream-white-surface: #FAECCF;
+  --color-soil-black: #3D3024;
+  --color-earth-gray: #887C71;
+  --color-carrot-orange: #FFA726;
+}
+
+@source inline('bg-tomato-red');
+@source inline('text-cream-white');
+@source inline('border-tomato-red');
+
 :root {
   --background: 38 85% 98%;
   --foreground: 28 33% 19%;

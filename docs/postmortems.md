@@ -43,3 +43,29 @@ npx create-next-app@latest toma --ts --tailwind --eslint --app --no-src-dir --im
 # 3. init 대신 add 명령어 실행
 cd /home/moonlygreat/toma && npx shadcn@latest add button --yes
 ```
+
+---
+
+## 2025년 8월 7일
+
+### 이슈 3: Primary Color Application Issue in Tailwind CSS v4
+
+**문제 (Problem):**
+Primary Button과 TaskCard의 테두리에 `tomato-red` 색상이 적용되지 않았습니다. 초기에는 `tailwind.config.ts`의 `safelist` 및 `theme.colors` 설정을 통해 해결을 시도했으나 실패했습니다. 또한, `autoprefixer` 종속성 누락으로 인해 서버 시작 문제가 발생했습니다.
+
+**원인 (Root Cause):**
+1.  **Tailwind CSS v4 설정 변경:** Tailwind CSS v4에서는 커스텀 색상 정의 및 `safelist` 설정 방식이 변경되었습니다. 이전 버전에서 사용되던 `tailwind.config.ts` 파일의 `colors` 및 `safelist` 옵션은 더 이상 유효하지 않으며, 이러한 설정은 이제 메인 CSS 파일(`app/globals.css`) 내의 `@theme` 및 `@source` 지시문을 통해 이루어져야 합니다.
+2.  **`autoprefixer` 종속성 누락:** `postcss.config.mjs`에 `autoprefixer` 플러그가 추가되었으나, 해당 패키지가 설치되지 않아 서버 시작 시 오류가 발생했습니다.
+
+**해결책 (Solution):**
+1.  **`autoprefixer` 설치:** `npm install autoprefixer` 명령어를 사용하여 `autoprefixer` 패키지를 설치했습니다.
+2.  **Tailwind CSS v4 설정 적용:**
+    *   `tailwind.config.ts` 파일을 원래 상태로 되돌렸습니다.
+    *   `app/globals.css` 파일에 `@theme` 지시문을 사용하여 `tomato-red`, `basil-green` 등 모든 커스텀 색상을 CSS 변수로 정의했습니다.
+    *   `app/globals.css` 파일에 `@source inline(...)` 지시문을 사용하여 `bg-tomato-red`, `text-cream-white`, `border-tomato-red`와 같이 동적으로 생성되는 Tailwind 클래스를 명시적으로 safelist에 추가했습니다.
+    *   `components/ui/button.tsx` 및 `components/ui/task-card.tsx` 파일에서 커스텀 CSS 클래스(`btn-primary-custom`, `border-tomato-red-custom`) 사용을 제거하고, Tailwind의 명명된 클래스(`bg-tomato-red`, `text-cream-white`, `border-tomato-red`)를 다시 사용하도록 변경했습니다.
+
+**교훈 (Lessons Learned):**
+1.  **프레임워크 주요 버전 변경 사항 숙지:** Tailwind CSS v4와 같이 주요 버전이 변경될 경우, 설정 방식에 큰 변화가 있을 수 있으므로 공식 문서를 통해 최신 설정 방법을 반드시 확인해야 합니다.
+2.  **종속성 관리의 중요성:** 새로운 패키지를 설정 파일에 추가할 경우, 해당 패키지가 프로젝트에 올바르게 설치되었는지 즉시 확인해야 합니다.
+3.  **정확한 진단 및 디버깅:** 문제 발생 시, 증상만을 보고 섣불리 판단하기보다는, 다양한 진단 방법을 통해 근본적인 원인을 파악하는 것이 중요합니다. 이번 경우, `safelist`가 작동하지 않는다는 초기 진단이 Tailwind v4의 설정 변경 때문임을 뒤늦게 파악했습니다.
