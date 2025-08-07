@@ -16,7 +16,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TaskCard title="Plant tomatoes" dueDate="Aug 25" status="growing" />
             <TaskCard title="Put tomatoes" dueDate="Aug 24" status="waiting" />
-            <TaskCard title="Due" status="harvested" />
+            <TaskCard title="Due" status="harvested" harvestedCount={3} />
           </div>
 
           <div className="mt-8">

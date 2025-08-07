@@ -80,6 +80,9 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      boxShadow: {
+        cream: '0 4px 6px -1px rgba(250, 236, 207, 0.5), 0 2px 4px -2px rgba(250, 236, 207, 0.5)',
+      },
       fontSize: {
         'headline': '1.5rem',      // 24px
         'subheadline': '1.125rem', // 18px
