@@ -1,7 +1,14 @@
-
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://kmdtswcayohamrxbgptf.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZHRzd2NheW9oYW1yeGJncHRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNzQ5OTAsImV4cCI6MjA2OTk1MDk5MH0.Gtkq8_bpDOiUeXDQPdkrxtLR2FNtrZlmoTka1x_9KaA';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_URL is not defined');
+}
+
+if (!supabaseAnonKey) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
