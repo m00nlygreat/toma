@@ -1,28 +1,44 @@
-import { supabaseAdmin } from '@/lib/supabase-admin';
 import { Button } from '@/components/ui/button';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
 
+async function runSql(query: string) {
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/pg`;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) {
+    return { data: null, error: data.error || res.statusText };
+  }
+  return { data, error: null };
+}
+
 async function ensureSchema() {
   try {
-    const query =
+    const check =
       "select table_name from information_schema.tables where table_schema = 'public' limit 1";
-    const { data, error } = await supabaseAdmin.rpc('exec_sql', { query });
+    const { data, error } = await runSql(check);
     if (error) {
-      return { success: false, message: error.message };
+      return { success: false, message: String(error) };
     }
 
     const tables = (data as { table_name: string }[]) ?? [];
     if (tables.length === 0) {
       const sqlPath = path.join(process.cwd(), 'docs', 'database.sql');
       const sql = await fs.readFile(sqlPath, 'utf8');
-      const { error: execError } = await supabaseAdmin.rpc('exec_sql', {
-        query: sql,
-      });
+      const { error: execError } = await runSql(sql);
       if (execError) {
-        return { success: false, message: execError.message };
+        return { success: false, message: String(execError) };
       }
       return { success: true, message: 'Database initialized successfully.' };
     }
@@ -38,7 +54,7 @@ async function resetDatabase() {
   try {
     const sqlPath = path.join(process.cwd(), 'docs', 'database.sql');
     const sql = await fs.readFile(sqlPath, 'utf8');
-    const { error } = await supabaseAdmin.rpc('exec_sql', { query: sql });
+    const { error } = await runSql(sql);
     if (error) {
       redirect('/initialize?reset=error');
     }
