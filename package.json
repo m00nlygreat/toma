@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "init-db": "ts-node scripts/initDatabase.ts"
+      "init-db": "tsc scripts/initDatabase.ts --module commonjs --outDir /tmp/initdb && node /tmp/initdb/initDatabase.js"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
