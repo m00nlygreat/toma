@@ -7,20 +7,20 @@ import path from 'path';
 
 async function ensureSchema() {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('information_schema.tables')
-      .select('table_name')
-      .eq('table_schema', 'public')
-      .limit(1);
-
+    const query =
+      "select table_name from information_schema.tables where table_schema = 'public' limit 1";
+    const { data, error } = await supabaseAdmin.rpc('exec_sql', { query });
     if (error) {
       return { success: false, message: error.message };
     }
 
-    if (data.length === 0) {
+    const tables = (data as { table_name: string }[]) ?? [];
+    if (tables.length === 0) {
       const sqlPath = path.join(process.cwd(), 'docs', 'database.sql');
       const sql = await fs.readFile(sqlPath, 'utf8');
-      const { error: execError } = await supabaseAdmin.rpc('exec_sql', { query: sql });
+      const { error: execError } = await supabaseAdmin.rpc('exec_sql', {
+        query: sql,
+      });
       if (execError) {
         return { success: false, message: execError.message };
       }
