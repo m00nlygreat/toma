@@ -49,16 +49,21 @@ async function resetDatabase() {
   }
 }
 
-export default async function InitializePage({ searchParams }: { searchParams?: { reset?: string } }) {
+type InitializePageProps = {
+  searchParams?: Promise<{ reset?: string }>;
+};
+
+export default async function InitializePage({ searchParams }: InitializePageProps) {
+  const params = (await searchParams) ?? {};
   const result = await ensureSchema();
 
   return (
     <div className="space-y-4 p-4">
       <p className={result.success ? 'text-green-600' : 'text-red-600'}>{result.message}</p>
-      {searchParams?.reset === 'success' && (
+      {params.reset === 'success' && (
         <p className="text-green-600">Database reset successfully.</p>
       )}
-      {searchParams?.reset === 'error' && (
+      {params.reset === 'error' && (
         <p className="text-red-600">Failed to reset database.</p>
       )}
       <form action={resetDatabase}>
