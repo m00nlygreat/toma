@@ -5,21 +5,22 @@ import fs from 'fs/promises';
 import path from 'path';
 
 async function runSql(query: string) {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1`;
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/pg`;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       apikey: key,
       Authorization: `Bearer ${key}`,
-      'Content-Type': 'application/vnd.pgrst.sql',
+      'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    body: query,
+    body: JSON.stringify({ query }),
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || data.error) {
-    return { data: null, error: data.error || res.statusText };
+  const json = await res.json().catch(() => ({}));
+  const data = json.result ?? json;
+  if (!res.ok || json.error) {
+    return { data: null, error: json.error || res.statusText };
   }
   return { data, error: null };
 }
