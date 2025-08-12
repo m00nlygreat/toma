@@ -5,26 +5,25 @@ import fs from 'fs/promises';
 import path from 'path';
 
 async function runSql(query: string) {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1`;
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/pg`;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       apikey: key,
       Authorization: `Bearer ${key}`,
-      'Content-Type': 'application/vnd.pgrst.sql',
-      Accept: 'application/json',
-      Prefer: 'tx=commit',
+      'Content-Type': 'application/json',
     },
-    body: query,
+    body: JSON.stringify({ query }),
   });
   const text = await res.text();
   try {
     const json = JSON.parse(text);
     if (!res.ok) {
-      return { data: null, error: json.message || res.statusText };
+      const errorMsg = json.error?.message || json.message || res.statusText;
+      return { data: null, error: errorMsg };
     }
-    return { data: json, error: null };
+    return { data: json.data ?? json, error: null };
   } catch {
     if (!res.ok) {
       return { data: null, error: text || res.statusText };
@@ -42,7 +41,7 @@ async function ensureSchema() {
       return { success: false, message: String(error) };
     }
 
-    const tables = (data as { table_name: string }[]) ?? [];
+    const tables = Array.isArray(data) ? (data as { table_name: string }[]) : [];
     if (tables.length === 0) {
       const sqlPath = path.join(process.cwd(), 'docs', 'database.sql');
       const sql = await fs.readFile(sqlPath, 'utf8');
