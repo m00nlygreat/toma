@@ -5,24 +5,32 @@ import fs from 'fs/promises';
 import path from 'path';
 
 async function runSql(query: string) {
-  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/pg`;
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1`;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       apikey: key,
       Authorization: `Bearer ${key}`,
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/vnd.pgrst.sql',
       Accept: 'application/json',
+      Prefer: 'tx=commit',
     },
-    body: JSON.stringify({ query }),
+    body: query,
   });
-  const json = await res.json().catch(() => ({}));
-  const data = json.result ?? json;
-  if (!res.ok || json.error) {
-    return { data: null, error: json.error || res.statusText };
+  const text = await res.text();
+  try {
+    const json = JSON.parse(text);
+    if (!res.ok) {
+      return { data: null, error: json.message || res.statusText };
+    }
+    return { data: json, error: null };
+  } catch {
+    if (!res.ok) {
+      return { data: null, error: text || res.statusText };
+    }
+    return { data: text, error: null };
   }
-  return { data, error: null };
 }
 
 async function ensureSchema() {
