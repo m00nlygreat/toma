@@ -34,3 +34,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Database
+
+The application connects to a Neon PostgreSQL instance using the
+`DATABASE_URL` environment variable. To create the basic tables and seed test
+data run:
+
+```bash
+export DATABASE_URL="<your-neon-connection-string>"
+node scripts/init-db.js
+```
+
+This script sets up simple `users` and `tasks` tables based on the schema in
+`docs/database.md` and inserts one sample task. The home page loads tasks from
+this database via the `/api/tasks` endpoint.

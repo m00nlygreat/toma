@@ -16,6 +16,7 @@ import { TaskCard } from "@/components/ui/task-card";
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tasks, setTasks] = useState<{ id: string; title: string }[]>([]);
 
   useEffect(() => {
     const getSession = async () => {
@@ -38,6 +39,20 @@ export default function Home() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
+
+  useEffect(() => {
+    async function loadTasks() {
+      try {
+        const res = await fetch('/api/tasks');
+        if (!res.ok) throw new Error('failed to fetch');
+        const data = await res.json();
+        setTasks(Array.isArray(data) ? data : []);
+      } catch {
+        setTasks([]);
+      }
+    }
+    loadTasks();
+  }, []);
 
   return (
     <main className="container mx-auto p-4">
@@ -63,9 +78,9 @@ export default function Home() {
         <div className="md:col-span-2">
           <h2 className="text-subheadline font-semibold mb-4">My Field</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <TaskCard title="Plant tomatoes" dueDate="Aug 25" status="growing" />
-            <TaskCard title="Put tomatoes" dueDate="Aug 24" status="waiting" />
-            <TaskCard title="Due" status="harvested" harvestedCount={3} />
+            {tasks.map((task) => (
+              <TaskCard key={task.id} title={task.title} />
+            ))}
           </div>
 
           <div className="mt-8">
