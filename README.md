@@ -34,3 +34,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Supabase Connection Test
+
+This project uses [Supabase](https://supabase.com) for data storage. Ensure that the tables match the schema described in [docs/database.md](docs/database.md).
+
+To verify your environment variables and connectivity, run:
+
+```bash
+npm run test:supabase
+```
+
+The script attempts a simple query against the `users` table and reports whether the connection succeeded.
