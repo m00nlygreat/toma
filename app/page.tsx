@@ -41,10 +41,17 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetch('/api/tasks')
-      .then((res) => res.json())
-      .then((data) => setTasks(data))
-      .catch(() => setTasks([]));
+    async function loadTasks() {
+      try {
+        const res = await fetch('/api/tasks');
+        if (!res.ok) throw new Error('failed to fetch');
+        const data = await res.json();
+        setTasks(Array.isArray(data) ? data : []);
+      } catch {
+        setTasks([]);
+      }
+    }
+    loadTasks();
   }, []);
 
   return (

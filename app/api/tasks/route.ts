@@ -4,6 +4,10 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 
 export async function GET() {
+  if (!pool) {
+    console.warn('Database not configured');
+    return NextResponse.json([]);
+  }
   try {
     const { rows } = await pool.query(
       'SELECT id, title FROM tasks ORDER BY created_at DESC LIMIT 10'
@@ -11,6 +15,6 @@ export async function GET() {
     return NextResponse.json(rows);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    return NextResponse.json([]);
   }
 }
